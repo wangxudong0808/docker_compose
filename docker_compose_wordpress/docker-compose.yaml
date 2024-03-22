@@ -1,0 +1,59 @@
+version: '3'
+services:
+    db_master:
+      image: mysql:5.7
+      volumes:
+           - ./my.cnf_master:/etc/my.cnf
+      environment:
+           MYSQL_ROOT_PASSWORD: DD.08.dd
+           MYSQL_DATABASE: wordpress
+           MYSQL_USER: admin
+           MYSQL_PASSWORD: DD.08.dd
+    db_slave:
+      image: mysql:5.7
+      volumes:
+           - ./my.cnf_slave:/etc/my.cnf
+      links:
+           - db_master:db_master
+      environment:
+           MYSQL_ROOT_PASSWORD: DD.08.dd
+    web1:
+      image: wordpress
+      ports:
+           - 80:80
+      links:
+           - db_master:mysql_master
+      healthcheck:
+           test: ["CMD","curl","-f","http://localhost"]
+           interval: 3s
+           timeout: 3s
+           retries: 3
+           start_period: 3s
+      environment:
+           WORDPRESS_DB_HOST: db_master
+           WORDPRESS_DB_USER: admin
+           WORDPRESS_DB_PASSWORD: DD.08.dd
+           WORDPRESS_DB_NAME: wordpress
+           WORDPRESS_TABLE_PREFIX: wp_
+    web2:
+      image: wordpress
+      ports:
+           - 81:80
+      links:
+           - db_master:mysql_master
+      healthcheck:
+           test: ["CMD","curl","-f","http://localhost"]
+           interval: 3s
+           timeout: 3s
+           retries: 3
+           start_period: 3s
+      environment:
+           WORDPRESS_DB_HOST: db_master
+           WORDPRESS_DB_USER: admin
+           WORDPRESS_DB_PASSWORD: DD.08.dd
+           WORDPRESS_DB_NAME: wordpress
+           WORDPRESS_TABLE_PREFIX: wp_
+      
+       
+
+
